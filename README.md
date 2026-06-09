@@ -101,7 +101,6 @@ Example trace:
 single tool agent/
 ├── agent.py          # Main agent (LLM + tool + executor)
 ├── requirements.txt  # Python dependencies
-├── .env.example      # API key template
 ├── .env              # Your actual API keys (not committed)
 └── README.md         # This file
 ```
