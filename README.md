@@ -1,106 +1,184 @@
-# 🤖 Single Tool Agent
+# 🤖 Memory-Aware Agentic AI Assistant
 
-A minimal AI agent that answers questions using web search.
+A personalized AI assistant built with LangChain, Groq LLMs, FAISS, and HuggingFace embeddings.
 
+The system combines Retrieval-Augmented Generation (RAG), long-term memory, semantic search, web search, and intent-based routing to provide context-aware and personalized responses.
+
+---
+
+## 🏗️ Architecture
+
+```text
+User Query
+     ↓
+Intent Router
+     ↓
+ ┌───────────────────────────────────┐
+ │   simple        → Direct Response │
+ │   memory        → Memory Update   │
+ │   tool          → Tool Agent      │
+ │   personal_tool → Personalized AI │
+ └───────────────────────────────────┘
+                 ↓
+            ReAct Agent
+                 ↓
+ ┌─────────────┬─────────────┬─────────────┐
+ │ Web Search  │ Calculator  │ RAG Search  │
+ └─────────────┴─────────────┴─────────────┘
+                 ↓
+             Response
 ```
-Question
-   ↓
-Agent  (ReAct reasoning loop)
-   ↓
-Web Search  (DuckDuckGo — free, no API key)
-   ↓
-LLM  (Google Gemini 2.0 Flash — free tier)
-   ↓
-Answer
-```
+
+---
+
+## ✨ Features
+
+### Intent-Based Routing
+
+Classifies user requests into:
+
+* `simple`
+* `memory`
+* `tool`
+* `personal_tool`
+
+and dynamically routes execution through the appropriate workflow.
+
+### Profile Memory
+
+Stores persistent user information such as:
+
+* Goals
+* Interests
+* Preferences
+* Education
+* Profession
+
+Stored in JSON format for fast retrieval.
+
+### Semantic Memory
+
+Stores long-term memories such as:
+
+* Projects completed
+* Courses completed
+* Skills learned
+* Achievements
+
+Uses FAISS vector search for semantic retrieval.
+
+### Retrieval-Augmented Generation (RAG)
+
+Supports querying custom PDF and text documents.
+
+Features:
+
+* Automatic document loading
+* Chunking using RecursiveCharacterTextSplitter
+* FAISS vector indexing
+* Semantic retrieval
+
+### Tool-Using Agent
+
+The assistant can autonomously decide when to use:
+
+* Web Search
+* Calculator
+* Document Retrieval
+
+using LangChain's ReAct Agent architecture.
+
+### Persistent Conversation History
+
+Maintains conversation history across sessions for improved context awareness.
+
+---
 
 ## 🛠️ Tech Stack
 
-| Component | Library / Model | Cost |
-|-----------|----------------|------|
-| **LLM** | `gemini-2.0-flash` via `langchain-google-genai` | Free |
-| **Web Search** | DuckDuckGo via `duckduckgo-search` | Free |
-| **Agent Framework** | LangChain ReAct Agent | Free / Open Source |
-
-> **Why LangChain (not LangGraph)?**  
-> With a single tool, the agent loop is simple: decide → search → answer.  
-> LangGraph is designed for complex multi-node graphs with looping states. LangChain's  
-> `create_react_agent` is cleaner and more appropriate here.
+| Component          | Technology         |
+| ------------------ | ------------------ |
+| LLM                | Groq Llama 3.3 70B |
+| Framework          | LangChain          |
+| Vector Database    | FAISS              |
+| Embeddings         | HuggingFace MiniLM |
+| Document Retrieval | RAG                |
+| Search Engine      | DuckDuckGo         |
+| Memory Storage     | JSON + FAISS       |
+| Language           | Python             |
 
 ---
 
-## ⚡ Quick Start
+## 📂 Project Structure
 
-### 1. Install dependencies
-```bash
-pip install -r requirements.txt
-```
-
-### 2. Set up your API key
-```bash
-# Copy the template
-copy .env.example .env
-
-# Edit .env and paste your Gemini API key
-# Get a free key at: https://aistudio.google.com/app/apikey
-```
-
-Your `.env` should look like:
-```
-GOOGLE_API_KEY=AIza...your_key_here
-```
-
-### 3. Run the agent
-
-**Interactive mode (chat loop):**
-```bash
-python agent.py
-```
-
-**Single question via CLI:**
-```bash
-python agent.py "What is the latest news on artificial intelligence?"
+```text
+project/
+│
+├── documents/
+│   ├── *.pdf
+│   └── *.txt
+│
+├── memory/
+│   ├── memory.json
+│   ├── chat_history.json
+│   └── semantic_memory/
+│
+├── faiss_index/
+│
+├── agent.py
+├── requirements.txt
+├── .env
+└── README.md
 ```
 
 ---
 
-## 📖 How It Works
+## 🚀 Key Concepts Demonstrated
 
-The agent uses the ReAct (Reasoning + Acting) pattern:
+* Agentic AI
+* ReAct Reasoning
+* Tool Calling
+* Intent Classification
+* Retrieval-Augmented Generation (RAG)
+* Long-Term Memory Systems
+* Semantic Search
+* Vector Databases
+* Personalized AI Assistants
+* Context-Aware Reasoning
 
-1. **Thought** — The LLM reasons about what it needs to do
-2. **Action** — It decides to call `web_search` with a query
-3. **Observation** — DuckDuckGo returns search results
-4. **Thought** — The LLM synthesizes the information
-5. **Final Answer** — A clear, grounded answer is returned
+---
 
-Example trace:
-```
-════════════════════════════════════════════════════════════
-  Question : What is the current price of gold?
-════════════════════════════════════════════════════════════
+## 🎯 Example Queries
 
-> Entering new AgentExecutor chain...
-  Thought: I need to search for the current gold price.
-  Action: web_search
-  Action Input: current gold price today 2025
-  Observation: Gold is trading at $3,200 per troy ounce...
-  Thought: I now know the final answer
-  Final Answer: The current price of gold is approximately $3,200 per troy ounce.
+```text
+What is the latest AI news?
 
-──────────────────────────────────────────────────────────
-  Answer   : The current price of gold is approximately $3,200 per troy ounce.
-──────────────────────────────────────────────────────────
+Summarize the company handbook.
+
+What projects have I completed?
+
+What technologies do I like?
+
+Calculate sqrt(144) * 25
+
+What do you remember about me?
 ```
 
 ---
 
-## 📁 Project Structure
+## 📈 Future Improvements
 
-```
-single tool agent/
-├── agent.py          # Main agent (LLM + tool + executor)
-├── requirements.txt  # Python dependencies
-├── .env              # Your actual API keys (not committed)
-└── README.md         # This file
-```
+* LangGraph Workflow Orchestration
+* Reflection & Self-Correction Loops
+* Episodic Memory
+* Hybrid Retrieval (BM25 + Vector Search)
+* Streaming Responses
+* Source Citation Generation
+
+---
+
+## Author
+
+Vasu Kumar
+
+Built as part of an AI Engineering learning journey focused on Agentic AI, RAG systems, memory architectures, and LLM-powered applications.
