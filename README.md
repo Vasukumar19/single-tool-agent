@@ -1,4 +1,4 @@
-# 🤖 Memory-Aware Agentic AI Assistant
+# 🤖 Memory-Aware Multi-Tool AI Assistant
 
 A personalized AI assistant built with LangChain, Groq LLMs, FAISS, and HuggingFace embeddings.
 
